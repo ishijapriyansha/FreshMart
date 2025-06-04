@@ -8,7 +8,7 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
-  const { cartItems, addToCart, updateQuantity, removeFromCart } = useCartStore();
+  const { cartItems, addToCart, updateQuantity} = useCartStore();
   
   // Find this product in cart
   const cartItem = cartItems.find(item => item.product.id === product.id && !item.isFree);
@@ -62,7 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {quantity > 0 ? (
           <div className="flex items-center justify-between">
             <button 
-              onClick={() => removeFromCart(product.id)}
+              onClick={() => updateQuantity(product.id, quantity - 1)}
               className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
             >
               <Minus size={16} className="text-gray-600" />
@@ -71,7 +71,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <span className="text-gray-800 font-medium">{quantity}</span>
             
             <button 
-              onClick={() => addToCart(product)}
+             onClick={() => {
+  if (quantity < product.stock) addToCart(product);
+}}
               className="p-2 rounded-full bg-green-500 hover:bg-green-600 transition-colors"
             >
               <Plus size={16} className="text-white" />

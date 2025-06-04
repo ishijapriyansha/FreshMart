@@ -22,11 +22,11 @@ A modern e-commerce application for grocery shopping built with React, TypeScrip
 - npm (v9 or higher)
 
 ### Installation
-
+(Make sure all adblocker extensions are disabled)
 1. Clone the repository
 ```bash
-git clone <repository-url>
-cd freshmart-groceries
+git clone https://github.com/ishijapriyansha/FreshMart
+cd QURB
 ```
 
 2. Install dependencies
