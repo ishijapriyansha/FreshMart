@@ -11,7 +11,7 @@ const Header: React.FC = () => {
   const { cartItems } = useCartStore();
   
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
-  const wishlistCount = 2; // Placeholder for demonstration
+  const wishlistCount = 0; // Placeholder for demonstration
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
