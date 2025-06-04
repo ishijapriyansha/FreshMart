@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, Heart, User } from 'lucide-react';
 import useProductStore from '../store/useProductStore';
-import useCartStore from '../store/useCartStore';
+import {useCartStore} from '../store/useCartStore';
 
 const Header: React.FC = () => {
   const location = useLocation();

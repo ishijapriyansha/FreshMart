@@ -4,7 +4,7 @@ import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import CheckoutPage from './pages/CheckoutPage';
 import useProductStore from './store/useProductStore';
-import useCartStore from './store/useCartStore';
+import {useCartStore} from './store/useCartStore';
 
 function App() {
   const { fetchAllProducts, products } = useProductStore();

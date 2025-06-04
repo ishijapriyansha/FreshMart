@@ -1,7 +1,7 @@
 import React from 'react';
 import { Heart, ShoppingCart, Plus, Minus } from 'lucide-react';
 import { Product } from '../types';
-import useCartStore from '../store/useCartStore';
+import {useCartStore} from '../store/useCartStore';
 
 interface ProductCardProps {
   product: Product;

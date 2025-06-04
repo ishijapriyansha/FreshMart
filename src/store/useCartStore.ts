@@ -1,152 +1,67 @@
 import { create } from 'zustand';
-import { Product, CartItem } from '../types';
 import { applyOffers, calculateDiscount } from '../lib/offers';
+import { Product, CartItem } from '../types';
+import { persist } from 'zustand/middleware'; 
 
-interface CartStore {
+interface CartState {
   cartItems: CartItem[];
-  products: Product[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
-  clearCart: () => void;
-  setProducts: (products: Product[]) => void;
+  products: Product[]; 
   subtotal: number;
   discount: number;
   total: number;
+  setProducts: (products: Product[]) => void;
+  addToCart: (product: Product) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
+  removeFromCart: (productId: string) => void;
 }
 
-const useCartStore = create<CartStore>((set, get) => ({
-  cartItems: [],
-  products: [],
-  
-  setProducts: (products: Product[]) => {
-    set({ products });
-    // Re-apply offers when products change
-    const { cartItems } = get();
-    const updatedCart = applyOffers(cartItems, products);
-    const discount = calculateDiscount(updatedCart);
-    const subtotal = calculateSubtotal(updatedCart);
-    set({ 
-      cartItems: updatedCart,
-      subtotal,
-      discount,
-      total: subtotal - discount
-    });
-  },
-  
-  addToCart: (product: Product) => {
-    const { cartItems, products } = get();
-    
-    // Find existing cart item
-    const existingItemIndex = cartItems.findIndex(
-      item => item.product.id === product.id && !item.isFree
-    );
-    
-    let updatedCart: CartItem[];
-    
-    if (existingItemIndex !== -1) {
-      // Update quantity if item exists
-      updatedCart = [...cartItems];
-      updatedCart[existingItemIndex] = {
-        ...updatedCart[existingItemIndex],
-        quantity: updatedCart[existingItemIndex].quantity + 1
-      };
-    } else {
-      // Add new item
-      updatedCart = [...cartItems, { product, quantity: 1 }];
-    }
-    
-    // Apply offers
-    updatedCart = applyOffers(updatedCart, products);
-    
-    // Calculate financials
-    const discount = calculateDiscount(updatedCart);
-    const subtotal = calculateSubtotal(updatedCart);
-    
-    set({ 
-      cartItems: updatedCart,
-      subtotal,
-      discount,
-      total: subtotal - discount
-    });
-  },
-  
-  removeFromCart: (productId: string) => {
-    const { cartItems, products } = get();
-    
-    // Filter out the item
-    let updatedCart = cartItems.filter(
-      item => !(item.product.id === productId && !item.isFree)
-    );
-    
-    // Re-apply offers
-    updatedCart = applyOffers(updatedCart, products);
-    
-    // Calculate financials
-    const discount = calculateDiscount(updatedCart);
-    const subtotal = calculateSubtotal(updatedCart);
-    
-    set({ 
-      cartItems: updatedCart,
-      subtotal,
-      discount,
-      total: subtotal - discount
-    });
-  },
-  
-  updateQuantity: (productId: string, quantity: number) => {
-    const { cartItems, products } = get();
-    
-    let updatedCart: CartItem[];
-    
-    if (quantity <= 0) {
-      // Remove item if quantity is 0 or negative
-      updatedCart = cartItems.filter(
-        item => !(item.product.id === productId && !item.isFree)
-      );
-    } else {
-      // Update quantity
-      updatedCart = cartItems.map(item => 
-        item.product.id === productId && !item.isFree
-          ? { ...item, quantity }
-          : item
-      );
-    }
-    
-    // Re-apply offers
-    updatedCart = applyOffers(updatedCart, products);
-    
-    // Calculate financials
-    const discount = calculateDiscount(updatedCart);
-    const subtotal = calculateSubtotal(updatedCart);
-    
-    set({ 
-      cartItems: updatedCart,
-      subtotal,
-      discount,
-      total: subtotal - discount
-    });
-  },
-  
-  clearCart: () => {
-    set({ 
+export const useCartStore = create<CartState>()(
+  persist(
+    (set, get) => ({
       cartItems: [],
+      products: [],
       subtotal: 0,
       discount: 0,
-      total: 0
-    });
-  },
-  
-  subtotal: 0,
-  discount: 0,
-  total: 0
-}));
+      total: 0,
 
-// Helper to calculate subtotal
-const calculateSubtotal = (cartItems: CartItem[]): number => {
-  return cartItems.reduce((total, item) => {
-    return total + (item.product.price * item.quantity);
-  }, 0);
-};
+      setProducts: (products) => set({ products }),
 
-export default useCartStore;
+      addToCart: (product) => {
+        const currentItems = [...get().cartItems];
+        const item = currentItems.find(i => i.product.id === product.id && !i.isFree);
+
+        if (item) item.quantity += 1;
+        else currentItems.push({ product, quantity: 1, isFree: false });
+
+        const updated = applyOffers(currentItems, get().products);
+        updateTotals(set, updated);
+      },
+
+      updateQuantity: (productId, quantity) => {
+        let items = get().cartItems.filter(i => !(i.product.id === productId && !i.isFree && quantity <= 0));
+        const item = items.find(i => i.product.id === productId && !i.isFree);
+        if (item) item.quantity = quantity;
+
+        const updated = applyOffers(items, get().products);
+        updateTotals(set, updated);
+      },
+
+      removeFromCart: (productId) => {
+
+  const filtered = get().cartItems.filter(i => i.product.id !== productId);
+  const updated = applyOffers(filtered, get().products);
+  updateTotals(set, updated);
+},
+
+    }),
+    { name: 'cart-store' }
+  )
+);
+
+function updateTotals(setFn: any, cartItems: CartItem[]) {
+  const subtotal = cartItems.filter(i => !i.isFree).reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const discount = calculateDiscount(cartItems);
+  const total = subtotal - discount;
+
+  setFn({ cartItems, subtotal, discount, total });
+}

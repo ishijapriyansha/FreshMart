@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import CategoryFilter from '../components/CategoryFilter';
 import ProductGrid from '../components/ProductGrid';
 import useProductStore from '../store/useProductStore';
-import useCartStore from '../store/useCartStore';
+import {useCartStore} from '../store/useCartStore';
 
 const HomePage: React.FC = () => {
   const { fetchAllProducts, products } = useProductStore();
