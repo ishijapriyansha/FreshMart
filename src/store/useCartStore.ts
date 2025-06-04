@@ -24,44 +24,69 @@ export const useCartStore = create<CartState>()(
       discount: 0,
       total: 0,
 
-      setProducts: (products) => set({ products }),
+      setProducts: (products) => {
+        console.log('Setting products:', products);
+        set({ products });
+      },
 
       addToCart: (product) => {
+        console.log('Adding to cart:', product);
         const currentItems = [...get().cartItems];
         const item = currentItems.find(i => i.product.id === product.id && !i.isFree);
 
-        if (item) item.quantity += 1;
-        else currentItems.push({ product, quantity: 1, isFree: false });
+        if (item) {
+          item.quantity += 1;
+          console.log('Updated existing item quantity:', item);
+        } else {
+          currentItems.push({ product, quantity: 1, isFree: false });
+          console.log('Added new item to cart');
+        }
 
         const updated = applyOffers(currentItems, get().products);
+        console.log('Cart after applying offers:', updated);
         updateTotals(set, updated);
       },
 
       updateQuantity: (productId, quantity) => {
-        let items = get().cartItems.filter(i => !(i.product.id === productId && !i.isFree && quantity <= 0));
-        const item = items.find(i => i.product.id === productId && !i.isFree);
-        if (item) item.quantity = quantity;
+        console.log('Updating quantity:', { productId, quantity });
+        if (quantity <= 0) {
+          get().removeFromCart(productId);
+          return;
+        }
+
+        let items = get().cartItems.filter(i => !i.isFree);
+        const item = items.find(i => i.product.id === productId);
+        
+        if (item) {
+          item.quantity = quantity;
+          console.log('Updated item quantity:', item);
+        }
 
         const updated = applyOffers(items, get().products);
+        console.log('Cart after applying offers:', updated);
         updateTotals(set, updated);
       },
 
       removeFromCart: (productId) => {
-
-  const filtered = get().cartItems.filter(i => i.product.id !== productId);
-  const updated = applyOffers(filtered, get().products);
-  updateTotals(set, updated);
-},
-
+        console.log('Removing from cart:', productId);
+        const filtered = get().cartItems.filter(i => i.product.id !== productId);
+        const updated = applyOffers(filtered, get().products);
+        console.log('Cart after applying offers:', updated);
+        updateTotals(set, updated);
+      },
     }),
     { name: 'cart-store' }
   )
 );
 
 function updateTotals(setFn: any, cartItems: CartItem[]) {
-  const subtotal = cartItems.filter(i => !i.isFree).reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const subtotal = cartItems
+    .filter(i => !i.isFree)
+    .reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+  
   const discount = calculateDiscount(cartItems);
   const total = subtotal - discount;
 
+  console.log('Updating totals:', { subtotal, discount, total });
   setFn({ cartItems, subtotal, discount, total });
 }

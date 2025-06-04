@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Minus, Trash2 } from 'lucide-react';
+import { Plus, Minus, Trash2, Gift } from 'lucide-react';
 import { CartItem as CartItemType } from '../types';
 import {useCartStore} from '../store/useCartStore';
 
@@ -36,20 +36,30 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
       <div className="ml-4 flex-1">
         <div className="flex justify-between">
           <div>
-            <h3 className="text-sm font-medium text-gray-900">{product.name}</h3>
+            <div className="flex items-center">
+              <h3 className="text-sm font-medium text-gray-900">{product.name}</h3>
+              {isFree && (
+                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                  <Gift size={12} className="mr-1" />
+                  Free
+                </span>
+              )}
+            </div>
             <p className="text-xs text-gray-500">Product code: {product.id}</p>
           </div>
           
           <div className="text-right">
-            <p className="text-sm font-medium text-gray-900">{formattedItemTotal}</p>
+            {!isFree && (
+              <p className="text-sm font-medium text-gray-900">{formattedItemTotal}</p>
+            )}
             <p className="text-xs text-gray-500">{formattedPrice} each</p>
           </div>
         </div>
         
         <div className="mt-2 flex items-center justify-between">
           {isFree ? (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-              Free Item
+            <span className="text-sm text-green-600">
+              Free item from offer
             </span>
           ) : (
             <div className="flex items-center">

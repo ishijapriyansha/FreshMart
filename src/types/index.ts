@@ -1,3 +1,14 @@
+export interface APIProduct {
+  id: number;
+  type: string;
+  name: string;
+  description: string;
+  rating: number;
+  img: string;
+  price: string;
+  available: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -23,16 +34,4 @@ export interface Offer {
   triggerQuantity: number;
   freeProductId: string;
   freeQuantity: number;
-}
-
-// API response type
-export interface APIProduct {
-  id: number;
-  type: string;
-  name: string;
-  description: string;
-  rating: number;
-  img: string;
-  price: string;
-  available: number;
 }
