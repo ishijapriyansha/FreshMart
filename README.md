@@ -26,7 +26,6 @@ A modern e-commerce application for grocery shopping built with React, TypeScrip
 1. Clone the repository
 ```bash
 git clone https://github.com/ishijapriyansha/FreshMart
-cd QURB
 ```
 
 2. Install dependencies
