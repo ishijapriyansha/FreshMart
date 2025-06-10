@@ -20,11 +20,6 @@ const Header: React.FC = () => {
     setSearchQuery(debouncedSearchValue);
   }, [debouncedSearchValue, setSearchQuery]);
   
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearchQuery(searchValue);
-  };
-  
   return (
     <header className="py-4 px-4 md:px-6 bg-white sticky top-0 z-10 shadow-sm">
       <div className="max-w-7xl mx-auto">
@@ -36,10 +31,7 @@ const Header: React.FC = () => {
             GROCERIES
           </Link>
           
-          <form 
-            onSubmit={handleSearch}
-            className="flex-grow max-w-md mx-4"
-          >
+          <div className="flex-grow max-w-md mx-4">
             <div className="relative">
               <input
                 type="text"
@@ -48,14 +40,11 @@ const Header: React.FC = () => {
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
               />
-              <button 
-                type="submit"
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              >
+              <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
                 <Search size={18} />
-              </button>
+              </div>
             </div>
-          </form>
+          </div>
           
           <div className="flex items-center space-x-4">
             <Link to="/wishlist" className="relative p-2">

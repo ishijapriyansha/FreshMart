@@ -104,12 +104,15 @@ const useProductStore = create<ProductStore>((set, get) => ({
   
   setSearchQuery: async (query: string) => {
     set({ searchQuery: query });
-    const { products } = get();
+    
+    // Get products for the current category
+    const { selectedCategory, categoryCache } = get();
+    const categoryProducts = categoryCache[selectedCategory] || [];
     
     if (query.trim() === '') {
-      set({ filteredProducts: products });
+      set({ filteredProducts: categoryProducts });
     } else {
-      const filtered = await searchProducts(query, products);
+      const filtered = await searchProducts(query, categoryProducts);
       set({ filteredProducts: filtered });
     }
   }
