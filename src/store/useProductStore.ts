@@ -9,6 +9,7 @@ interface ProductStore {
   searchQuery: string;
   isLoading: boolean;
   error: string | null;
+  categoryCache: Record<string, Product[]>;
   fetchAllProducts: () => Promise<void>;
   setCategory: (category: string) => Promise<void>;
   setSearchQuery: (query: string) => void;
@@ -21,16 +22,30 @@ const useProductStore = create<ProductStore>((set, get) => ({
   searchQuery: '',
   isLoading: false,
   error: null,
+  categoryCache: {},
   
   fetchAllProducts: async () => {
     set({ isLoading: true, error: null });
     try {
+      // Check cache first
+      const cachedProducts = get().categoryCache['all'];
+      if (cachedProducts) {
+        set({ 
+          products: cachedProducts,
+          filteredProducts: cachedProducts,
+          isLoading: false
+        });
+        return;
+      }
+
       const products = await fetchProducts('all');
-      set({ 
+      // Update cache
+      set(state => ({
+        categoryCache: { ...state.categoryCache, 'all': products },
         products,
         filteredProducts: products,
         isLoading: false
-      });
+      }));
     } catch (error) {
       set({ 
         error: 'Failed to fetch products',
@@ -40,13 +55,30 @@ const useProductStore = create<ProductStore>((set, get) => ({
   },
   
   setCategory: async (category: string) => {
+    // Check if the category has actually changed
+    if (category === get().selectedCategory) {
+      return;
+    }
+
     set({ isLoading: true, selectedCategory: category, error: null });
     try {
-      let products;
-      if (category === 'all') {
-        products = await fetchProducts('all');
+      let products: Product[];
+      
+      // Check cache first
+      const cachedProducts = get().categoryCache[category];
+      if (cachedProducts) {
+        products = cachedProducts;
       } else {
-        products = await fetchProducts(category);
+        // Fetch from API if not in cache
+        if (category === 'all') {
+          products = await fetchProducts('all');
+        } else {
+          products = await fetchProducts(category);
+        }
+        // Update cache
+        set(state => ({
+          categoryCache: { ...state.categoryCache, [category]: products }
+        }));
       }
       
       // Apply search query if it exists

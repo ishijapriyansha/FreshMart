@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, Heart, User } from 'lucide-react';
 import useProductStore from '../store/useProductStore';
 import {useCartStore} from '../store/useCartStore';
+import useDebounce from '../hooks/useDebounce';
 
 const Header: React.FC = () => {
   const location = useLocation();
@@ -12,6 +13,12 @@ const Header: React.FC = () => {
   
   const cartItemCount = cartItems.reduce((total, item) => total + item.quantity, 0);
   const wishlistCount = 0; // Placeholder for demonstration
+  
+  const debouncedSearchValue = useDebounce(searchValue, 300);
+  
+  useEffect(() => {
+    setSearchQuery(debouncedSearchValue);
+  }, [debouncedSearchValue, setSearchQuery]);
   
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
