@@ -28,49 +28,43 @@ export const offers: Offer[] = [
 export const applyOffers = (cartItems: CartItem[], products: Product[]): CartItem[] => {
   console.log('Applying offers to cart items:', cartItems);
   console.log('Available products:', products);
-  
+
   const result: CartItem[] = [...cartItems];
-  let freeItems: CartItem[] = [];
 
-  // First, remove any existing free items
+  // Separate regular and free items
   const regularItems = result.filter(item => !item.isFree);
-  console.log('Regular items:', regularItems);
+  let newFreeItems: CartItem[] = [];
 
-  // Process each offer
+  // Loop through each offer
   offers.forEach(offer => {
-    console.log('Processing offer:', offer);
-    
     const triggerItem = regularItems.find(item => item.product.id === offer.triggerProductId);
-    console.log('Found trigger item:', triggerItem);
-    
+
     if (triggerItem && triggerItem.quantity >= offer.triggerQuantity) {
-      // Calculate how many free items to add
       const freeItemsCount = Math.floor(triggerItem.quantity / offer.triggerQuantity) * offer.freeQuantity;
-      console.log('Calculated free items count:', freeItemsCount);
-      
-      // Find the free product
+
       const freeProduct = products.find(p => p.id === offer.freeProductId);
-      console.log('Found free product:', freeProduct);
-      
+
       if (freeProduct) {
-        // Remove any existing free items for this offer
-        freeItems = freeItems.filter(item => item.product.id !== offer.freeProductId);
-        
-        // Add new free items
-        freeItems.push({
-          product: freeProduct,
-          quantity: freeItemsCount,
-          isFree: true
-        });
-        console.log('Added free items:', freeItems);
+        const existingFreeItem = newFreeItems.find(i => i.product.id === freeProduct.id);
+
+        if (existingFreeItem) {
+          existingFreeItem.quantity += freeItemsCount;
+        } else {
+          newFreeItems.push({
+            product: freeProduct,
+            quantity: freeItemsCount,
+            isFree: true
+          });
+        }
       }
     }
   });
 
-  const finalCart = [...regularItems, ...freeItems];
+  const finalCart = [...regularItems, ...newFreeItems];
   console.log('Final cart after applying offers:', finalCart);
   return finalCart;
 };
+
 
 // Calculate total discount from applied offers
 export const calculateDiscount = (cartItems: CartItem[]): number => {

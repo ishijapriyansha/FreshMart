@@ -24,8 +24,10 @@ const OrderSummary: React.FC = () => {
         </div>
         
         <div className="flex justify-between">
-          <p className="text-gray-600">Discount</p>
+          <p className="text-gray-600">Free Items</p>
           <p className="text-green-600">-{formatCurrency(discount)}</p>
+          {/* <span style={{ color: 'green' }}>
+          → {item.quantity} coffee(s) added for free</span> */}
         </div>
         
         <div className="pt-3 border-t border-gray-200">

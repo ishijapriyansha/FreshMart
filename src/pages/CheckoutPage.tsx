@@ -10,7 +10,7 @@ const CheckoutPage: React.FC = () => {
   const { products } = useProductStore();
   const { cartItems, setProducts } = useCartStore();
 
-  // Make sure products are set in the cart store so offers apply correctly
+  
   useEffect(() => {
     setProducts(products);
   }, [products, setProducts]);
@@ -23,6 +23,15 @@ const CheckoutPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
+          {cartItems.length > 0 && (
+            <Link
+              to="/"
+              className="flex items-center text-green-600 hover:text-green-700 font-medium mb-4"
+            >
+              <ArrowLeft size={16} className="mr-1" />
+              Continue shopping
+            </Link>
+          )}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
             {cartItems.length > 0 ? (
               <>
@@ -47,16 +56,6 @@ const CheckoutPage: React.FC = () => {
               </div>
             )}
           </div>
-
-          {cartItems.length > 0 && (
-            <Link
-              to="/"
-              className="flex items-center text-green-600 hover:text-green-700 font-medium"
-            >
-              <ArrowLeft size={16} className="mr-1" />
-              Continue shopping
-            </Link>
-          )}
         </div>
 
         <div className="lg:col-span-1">

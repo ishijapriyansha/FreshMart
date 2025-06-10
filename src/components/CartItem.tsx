@@ -41,7 +41,7 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
               {isFree && (
                 <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                   <Gift size={12} className="mr-1" />
-                  Free
+                  Free (x{quantity})
                 </span>
               )}
             </div>
@@ -74,7 +74,12 @@ const CartItem: React.FC<CartItemProps> = ({ item }) => {
               
               <button 
                 onClick={() => updateQuantity(product.id, quantity + 1)}
-                className="p-1 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+                disabled={quantity >= product.stock}
+                className={`p-1 rounded-full transition-colors ${
+                  quantity >= product.stock 
+                    ? 'bg-gray-100 cursor-not-allowed opacity-50' 
+                    : 'bg-gray-100 hover:bg-gray-200'
+                }`}
               >
                 <Plus size={14} className="text-gray-600" />
               </button>

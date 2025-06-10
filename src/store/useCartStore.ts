@@ -58,8 +58,15 @@ export const useCartStore = create<CartState>()(
         const item = items.find(i => i.product.id === productId);
         
         if (item) {
-          item.quantity = quantity;
-          console.log('Updated item quantity:', item);
+          // Check if the requested quantity is within stock limits
+          const product = get().products.find(p => p.id === productId);
+          if (product && quantity <= product.stock) {
+            item.quantity = quantity;
+            console.log('Updated item quantity:', item);
+          } else {
+            console.log('Cannot update quantity: exceeds stock limit');
+            return;
+          }
         }
 
         const updated = applyOffers(items, get().products);
@@ -84,8 +91,9 @@ function updateTotals(setFn: any, cartItems: CartItem[]) {
     .filter(i => !i.isFree)
     .reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   
-  const discount = calculateDiscount(cartItems);
-  const total = subtotal - discount;
+  // const discount = calculateDiscount(cartItems);
+  const discount = 0;
+  const total = subtotal;
 
   console.log('Updating totals:', { subtotal, discount, total });
   setFn({ cartItems, subtotal, discount, total });
