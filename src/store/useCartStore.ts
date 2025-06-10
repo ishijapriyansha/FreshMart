@@ -91,8 +91,8 @@ function updateTotals(setFn: any, cartItems: CartItem[]) {
     .filter(i => !i.isFree)
     .reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   
-  // const discount = calculateDiscount(cartItems);
-  const discount = 0;
+  const discount = calculateDiscount(cartItems);
+  // const discount = 0;
   const total = subtotal;
 
   console.log('Updating totals:', { subtotal, discount, total });
